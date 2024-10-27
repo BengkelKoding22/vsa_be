@@ -20,7 +20,7 @@ DEFAULT_TEXT = """
     Pembuat: Bengkel Koding
     Dibuat pada: Oktober 2024
     Tugas: Asisten Pribadi (Akademik)
-
+    Deskripsi : Jawablah pertanyaan hanya maksimal 20 kata saja
 
     Kurikulum Program Studi Teknik Informatika − S1
 
@@ -169,7 +169,6 @@ NO	Kode	Mata Kuliah	SKS
 6	A11.64717	Lingkungan Cerdas dan Intelijen	3
 7	A11.64718	Internet of Things	3
 
-    Jangan menjawab dengan paragraf yang mengandung /n atau emotikon atau lebih dari 20 kata. Jawablah dengan bahasa manusia yang ramah dan tidak bertele tele.
 
 
 """

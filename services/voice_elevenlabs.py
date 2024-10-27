@@ -9,7 +9,7 @@ def generate_speech(text):
     headers = {
         "Accept": "audio/mpeg",
         "Content-Type": "application/json",
-        "xi-api-key": ELEVENLAB_API_KEY  # Ganti <xi-api-key> dengan kunci API Anda
+        "xi-api-key": ELEVENLAB_API_KEY  
     }
 
     data = {
