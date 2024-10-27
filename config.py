@@ -10,7 +10,7 @@ if not API_KEY:
 
 GENERATION_CONFIG = {
     "candidate_count": 1,
-    "max_output_tokens": 500,
+    "max_output_tokens": 100,
     "temperature": 1.0
 }
 
