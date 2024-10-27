@@ -5,6 +5,14 @@ from PIL import Image
 import onnxruntime
 import pickle
 from models.schemas import MetaResponse, ApiResponse
+import base64
+
+
+def audio_to_base64(file_path):
+    with open(file_path, "rb") as audio_file:
+        audio_base64 = base64.b64encode(audio_file.read()).decode("utf-8")
+    return audio_base64
+
 
 def create_response(status: str, code: int, message: str, data: dict = None) -> ApiResponse:
     meta = MetaResponse(status=status, code=code, message=message)
