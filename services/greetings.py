@@ -8,9 +8,13 @@ def generate_greeting(results):
 
         # Menentukan sapaan berdasarkan emosi
         if emotion == "happy":
-            greeting = f"halo {name}, sepertinya hari ini wajahmu bahagia"
+            greeting = f"halo {name}, sepertinya hari ini cerah sekali ya, semoga harimu menyenangkan"
         elif emotion == "sad":
             greeting = f"halo {name}, mengapa wajahmu terlihat sedih, senyum dong"
+        elif emotion == "angry":
+            greeting = f"halo {name}, mengapa wajahmu terlihat murung, senyum dong"
+        elif emotion == "surprise":
+            greeting = f"halo {name}, ada kabar apa hari ini"
         else:
             greeting = f"halo {name}"
 
