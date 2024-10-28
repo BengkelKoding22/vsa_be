@@ -38,10 +38,12 @@ async def generate_text(request: TextRequest):
 
     try:
         response_text, link = generate_text_response(input_text)
-        clean_text = re.sub(r'[^\w\s]', '', response_text)
-        clean_text = re.sub(r'\n', '', clean_text)
+        # clean_text = re.sub(r'[^\w\s]', '', response_text)
+        clean_text = re.sub(r'\n', '', response_text)
         # audio = generate_speech(clean_text)
+        # audio = await run_edge_tts(clean_text)     
         audio = await run_edge_tts(clean_text)     
+        # audio_base64 = audio_to_base64(audio)
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
         if link:
