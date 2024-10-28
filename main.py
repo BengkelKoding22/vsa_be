@@ -6,7 +6,9 @@ from services.face_recognition import detect_faces
 from utils.helpers import create_response, audio_to_base64
 from services.voice_elevenlabs import generate_speech
 from services.greetings import generate_greeting
-from services.voice_tts import run_edge_tts
+from services.tts_edge import run_edge_tts
+from services.tts_google import gtts_text_to_speech
+from services.tts_balena import balena_text_to_speech
 import re
 import os
 import time
@@ -44,7 +46,16 @@ async def generate_text(request: TextRequest):
         clean_text = re.sub(r'\n', '', response_text)
         # audio = generate_speech(clean_text)
         # audio = await run_edge_tts(clean_text)     
-        audio = await run_edge_tts(clean_text)     
+
+        # pakai edge tts
+        # audio = await run_edge_tts(clean_text)     
+
+        # pakai google tts
+        # audio = gtts_text_to_speech(clean_text)
+
+        # pakai balena tts
+        audio = balena_text_to_speech(clean_text)
+
         # audio_base64 = audio_to_base64(audio)
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
@@ -92,20 +103,13 @@ async def generate_audio(request: TextRequest):
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
 
-        if link:
-            return create_response(
-                status="success",
-                code=200,
-                message="Request successful",
-                data={"response": input_text, "audio": audio_base64}
-            )
-        else:
-            return create_response(
-                status="success",
-                code=200,
-                message="Request successful",
-                data={"response": input_text, "audio": audio_base64}
-            )
+        return create_response(
+            status="success",
+            code=200,
+            message="Request successful",
+            data={"response": input_text, "audio": audio_base64}
+        )
+      
     except Exception as e:
         return create_response(
             status="error",
