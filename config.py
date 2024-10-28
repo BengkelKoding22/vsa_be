@@ -3,13 +3,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+ELEVENLAB_API_KEY = os.getenv("ELEVEN_LAB_API_KEY")
 API_KEY = os.getenv("API_KEY")
 if not API_KEY:
     raise Exception("API Key tidak ditemukan. Pastikan API Key sudah ada di .env")
 
 GENERATION_CONFIG = {
     "candidate_count": 1,
-    "max_output_tokens": 500,
+    "max_output_tokens": 100,
     "temperature": 1.0
 }
 
