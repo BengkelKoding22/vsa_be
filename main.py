@@ -92,12 +92,20 @@ async def generate_audio(request: TextRequest):
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
 
-        return create_response(
-            status="success",
-            code=200,
-            message="Request successful",
-            data={"response": input_text, "audio": audio_base64}
-        )
+        if link:
+            return create_response(
+                status="success",
+                code=200,
+                message="Request successful",
+                data={"response": input_text, "audio": audio_base64}
+            )
+        else:
+            return create_response(
+                status="success",
+                code=200,
+                message="Request successful",
+                data={"response": input_text, "audio": audio_base64}
+            )
     except Exception as e:
         return create_response(
             status="error",
@@ -143,11 +151,6 @@ async def detect_face(file: UploadFile = File(...)):
             data={
                 "results": result, 
                 "response": greeting,
-                "durations": {
-                    "detect_faces": detect_faces_duration,
-                    "generate_greeting": generate_greeting_duration,
-                    "run_edge_tts": run_edge_tts_duration
-                }
             }
         )
     except ValueError as ve:
