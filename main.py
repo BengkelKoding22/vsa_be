@@ -5,6 +5,8 @@ from services.text_generation import generate_text_response
 from services.face_recognition import detect_faces
 from utils.helpers import create_response, audio_to_base64
 from services.voice_elevenlabs import generate_speech
+from services.greetings import generate_greeting
+from services.voice_tts import run_edge_tts
 import re
 import os
 
@@ -38,7 +40,8 @@ async def generate_text(request: TextRequest):
         response_text, link = generate_text_response(input_text)
         clean_text = re.sub(r'[^\w\s]', '', response_text)
         clean_text = re.sub(r'\n', '', clean_text)
-        audio = generate_speech(clean_text)
+        # audio = generate_speech(clean_text)
+        audio = await run_edge_tts(greeting)     
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
         if link:
@@ -74,12 +77,17 @@ async def detect_face(file: UploadFile = File(...)):
             raise ValueError("No file uploaded")
 
         result = await detect_faces(file)
+        if result :
+            greeting = generate_greeting(result)
+            audio = await run_edge_tts(greeting)     
+            audio_base64 = audio_to_base64(audio)
+            os.remove(audio)
 
         return create_response(
             status="success",
             code=200,
             message="Face detection successful",
-            data={"results": result}
+            data={"results": result, "audio": audio_base64, "response": greeting}
         )
     except ValueError as ve:
         logging.error(f"ValueError: {ve}")

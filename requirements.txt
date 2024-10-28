@@ -10,3 +10,4 @@ torch
 scipy
 ultralytics
 python-multipart
+edge_tts
