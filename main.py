@@ -9,6 +9,8 @@ from services.greetings import generate_greeting
 from services.voice_tts import run_edge_tts
 import re
 import os
+import time
+import logging
 
 
 app = FastAPI()
@@ -72,25 +74,89 @@ async def generate_text(request: TextRequest):
 async def exit_chat():
     return {"message": "Chatbot telah dihentikan."}
 
+@app.post("/generate_audio",response_model=ApiResponse)
+async def generate_audio(request: TextRequest):
+    input_text = request.text
+    if not input_text:
+        return create_response(
+            status="error",
+            code=400,
+            message="No text provided",
+            data={}
+        )
+
+    try:
+        response_text, link = generate_text_response(input_text)
+        clean_text = re.sub(r'\n', '', response_text)
+        audio = await run_edge_tts(clean_text)
+        audio_base64 = audio_to_base64(audio)
+        os.remove(audio)
+
+        if link:
+            return create_response(
+                status="success",
+                code=200,
+                message="Request successful",
+                data={"response": clean_text, "link": link, "audio": audio_base64}
+            )
+        else:
+            return create_response(
+                status="success",
+                code=200,
+                message="Request successful",
+                data={"response": clean_text, "audio": audio_base64}
+            )
+    except Exception as e:
+        return create_response(
+            status="error",
+            code=500,
+            message=str(e),
+            data={}
+        )
+
 @app.post("/detect/", response_model=ApiResponse)
 async def detect_face(file: UploadFile = File(...)):
     try:
         if not file:
             raise ValueError("No file uploaded")
 
+        # Mulai pengukuran waktu untuk `detect_faces`
+        start_detect_faces = time.monotonic()
         result = await detect_faces(file)
-        if result :
+        detect_faces_duration = time.monotonic() - start_detect_faces
+        
+        if result:
+            # Mulai pengukuran waktu untuk `generate_greeting`
+            start_generate_greeting = time.monotonic()
             greeting = generate_greeting(result)
-            audio = await run_edge_tts(greeting)     
+            generate_greeting_duration = time.monotonic() - start_generate_greeting
+            
+            # Mulai pengukuran waktu untuk `run_edge_tts`
+            start_run_edge_tts = time.monotonic()
+            audio = await run_edge_tts(greeting)
+            run_edge_tts_duration = time.monotonic() - start_run_edge_tts
+            
             audio_base64 = audio_to_base64(audio)
             os.remove(audio)
+
+        # Logging durasi waktu masing-masing fungsi
+        logging.info(f"detect_faces duration: {detect_faces_duration:.2f} seconds")
+        logging.info(f"generate_greeting duration: {generate_greeting_duration:.2f} seconds")
+        logging.info(f"run_edge_tts duration: {run_edge_tts_duration:.2f} seconds")
 
         return create_response(
             status="success",
             code=200,
             message="Face detection successful",
-            # data={"results": result, "audio": audio_base64, "response": greeting}
-            data={"results": result,  "response": greeting}
+            data={
+                "results": result, 
+                "response": greeting,
+                "durations": {
+                    "detect_faces": detect_faces_duration,
+                    "generate_greeting": generate_greeting_duration,
+                    "run_edge_tts": run_edge_tts_duration
+                }
+            }
         )
     except ValueError as ve:
         logging.error(f"ValueError: {ve}")
@@ -108,6 +174,44 @@ async def detect_face(file: UploadFile = File(...)):
             message="Error in face detection",
             data={}
         )
+
+
+# @app.post("/detect/", response_model=ApiResponse)
+# async def detect_face(file: UploadFile = File(...)):
+#     try:
+#         if not file:
+#             raise ValueError("No file uploaded")
+
+#         result = await detect_faces(file)
+#         if result :
+#             greeting = generate_greeting(result)
+#             audio = await run_edge_tts(greeting)     
+#             audio_base64 = audio_to_base64(audio)
+#             os.remove(audio)
+
+#         return create_response(
+#             status="success",
+#             code=200,
+#             message="Face detection successful",
+#             # data={"results": result, "audio": audio_base64, "response": greeting}
+#             data={"results": result,  "response": greeting}
+#         )
+#     except ValueError as ve:
+#         logging.error(f"ValueError: {ve}")
+#         return create_response(
+#             status="error",
+#             code=400,
+#             message=str(ve),
+#             data={}
+#         )
+#     except Exception as e:
+#         logging.error(f"Unexpected error during face detection: {e}")
+#         return create_response(
+#             status="error",
+#             code=500,
+#             message="Error in face detection",
+#             data={}
+#         )
 
 if __name__ == "__main__":
     import uvicorn
