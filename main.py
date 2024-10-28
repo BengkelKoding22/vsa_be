@@ -89,7 +89,8 @@ async def detect_face(file: UploadFile = File(...)):
             status="success",
             code=200,
             message="Face detection successful",
-            data={"results": result, "audio": audio_base64, "response": greeting}
+            # data={"results": result, "audio": audio_base64, "response": greeting}
+            data={"results": result,  "response": greeting}
         )
     except ValueError as ve:
         logging.error(f"ValueError: {ve}")
