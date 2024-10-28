@@ -86,26 +86,18 @@ async def generate_audio(request: TextRequest):
         )
 
     try:
-        response_text, link = generate_text_response(input_text)
-        clean_text = re.sub(r'\n', '', response_text)
-        audio = await run_edge_tts(clean_text)
+        # response_text, link = generate_text_response(input_text)
+        # clean_text = re.sub(r'\n', '', response_text)
+        audio = await run_edge_tts(input_text)
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
 
-        if link:
-            return create_response(
-                status="success",
-                code=200,
-                message="Request successful",
-                data={"response": clean_text, "link": link, "audio": audio_base64}
-            )
-        else:
-            return create_response(
-                status="success",
-                code=200,
-                message="Request successful",
-                data={"response": clean_text, "audio": audio_base64}
-            )
+        return create_response(
+            status="success",
+            code=200,
+            message="Request successful",
+            data={"response": input_text, "audio": audio_base64}
+        )
     except Exception as e:
         return create_response(
             status="error",
