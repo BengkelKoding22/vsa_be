@@ -48,13 +48,13 @@ async def generate_text(request: TextRequest):
         # audio = await run_edge_tts(clean_text)     
 
         # pakai edge tts
-        # audio = await run_edge_tts(clean_text)     
+        audio = await run_edge_tts(clean_text, "audio")     
 
         # pakai google tts
         # audio = gtts_text_to_speech(clean_text)
 
         # pakai balena tts
-        audio = balena_text_to_speech(clean_text)
+        # audio = balena_text_to_speech(clean_text)
 
         # audio_base64 = audio_to_base64(audio)
         audio_base64 = audio_to_base64(audio)
@@ -99,7 +99,7 @@ async def generate_audio(request: TextRequest):
     try:
         # response_text, link = generate_text_response(input_text)
         # clean_text = re.sub(r'\n', '', response_text)
-        audio = await run_edge_tts(input_text)
+        audio = await run_edge_tts(input_text, "generate_audio")
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
 
@@ -137,7 +137,7 @@ async def detect_face(file: UploadFile = File(...)):
             
             # Mulai pengukuran waktu untuk `run_edge_tts`
             start_run_edge_tts = time.monotonic()
-            audio = await run_edge_tts(greeting)
+            audio = await run_edge_tts(greeting, "detect")
             run_edge_tts_duration = time.monotonic() - start_run_edge_tts
             
             audio_base64 = audio_to_base64(audio)
