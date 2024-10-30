@@ -11,7 +11,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model = YOLO('model_weights/yolov8n-face.pt').to(device)
 
 async def detect_faces(file: UploadFile) -> list:
-    try:
+    try:   
         # Membaca file yang diupload sebagai byte
         contents = await file.read()
         
