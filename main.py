@@ -49,8 +49,8 @@ async def generate_text(request: TextRequest):
         # audio = await run_edge_tts(clean_text)     
 
         # pakai edge tts
-        # audio = await run_edge_tts(clean_text, "audio")     
-        audio = generate_speech(clean_text)
+        audio = await run_edge_tts(clean_text, "audio")     
+        # audio = generate_speech(clean_text)
 
         # pakai google tts
         # audio = gtts_text_to_speech(clean_text)
@@ -98,9 +98,9 @@ async def generate_audio(request: TextRequest):
     try:
         # response_text, link = generate_text_response(input_text)
         # clean_text = re.sub(r'\n', '', response_text)
-        # audio = await run_edge_tts(input_text, "generate_audio")
+        audio = await run_edge_tts(input_text, "generate_audio")
         # audio = gtts_text_to_speech(input_text)
-        audio =  generate_speech(input_text)
+        # audio =  generate_speech(input_text)
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
 
