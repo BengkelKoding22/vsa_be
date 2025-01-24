@@ -13,3 +13,13 @@ python-multipart
 edge_tts
 gTTS
 requests
+groq
+loguru
+
+motor==3.2.0  # Includes pymongo>=4.4,<5 as a dependency
+pymongo==4.4  # Ensure compatibility with motor and remove direct bson dependency
+
+# Pydantic for data validation
+pydantic[email]>=2.0.0  # Include email validation if needed
+pydantic-settings>=2.0.0
+

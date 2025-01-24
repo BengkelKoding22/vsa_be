@@ -1,6 +1,6 @@
 import requests
 import datetime
-from config import ELEVENLAB_API_KEY
+from core.config import settings
 
 def generate_speech(text):
     CHUNK_SIZE = 1024
@@ -9,7 +9,7 @@ def generate_speech(text):
     headers = {
         "Accept": "audio/mpeg",
         "Content-Type": "application/json",
-        "xi-api-key": ELEVENLAB_API_KEY  
+        "xi-api-key": settings.ELEVEN_LAB_API_KEY  
     }
 
     data = {

@@ -8,11 +8,15 @@ from services.voice_elevenlabs import generate_speech
 from services.greetings import generate_greeting
 from services.tts_edge import run_edge_tts
 from services.tts_google import gtts_text_to_speech
-from services.tts_balena import balena_text_to_speech
 import re
 import os
 import time
 import logging
+from logger.logger import configure_logger
+
+configure_logger()
+
+import routes.tts_route as tts_router
 
 
 app = FastAPI()
@@ -24,6 +28,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(tts_router.router, prefix="/tts", tags=["Text To Speech"])
 
 
 @app.post("/generate",response_model=ApiResponse)
@@ -40,7 +46,6 @@ async def generate_text(request: TextRequest):
                 "audio" :  intro
             }
         )
-
     try:
         response_text, link = generate_text_response(input_text)
         # clean_text = re.sub(r'[^\w\s]', '', response_text)
@@ -49,8 +54,8 @@ async def generate_text(request: TextRequest):
         # audio = await run_edge_tts(clean_text)     
 
         # pakai edge tts
-        # audio = await run_edge_tts(clean_text, "audio")     
-        audio = generate_speech(clean_text)
+        audio = await run_edge_tts(clean_text, "audio")     
+        # audio = generate_speech(clean_text)
 
         # pakai google tts
         # audio = gtts_text_to_speech(clean_text)
@@ -98,9 +103,9 @@ async def generate_audio(request: TextRequest):
     try:
         # response_text, link = generate_text_response(input_text)
         # clean_text = re.sub(r'\n', '', response_text)
-        # audio = await run_edge_tts(input_text, "generate_audio")
+        audio = await run_edge_tts(input_text, "generate_audio")
         # audio = gtts_text_to_speech(input_text)
-        audio =  generate_speech(input_text)
+        # audio =  generate_speech(input_text)
         audio_base64 = audio_to_base64(audio)
         os.remove(audio)
 
@@ -176,51 +181,10 @@ async def detect_face(file: UploadFile = File(...)):
         )
 
 
-# @app.post("/detect/", response_model=ApiResponse)
-# async def detect_face(file: UploadFile = File(...)):
-#     try:
-#         if not file:
-#             raise ValueError("No file uploaded")
 
-#         result = await detect_faces(file)
-#         if result :
-#             greeting = generate_greeting(result)
-#             audio = await run_edge_tts(greeting)     
-#             audio_base64 = audio_to_base64(audio)
-#             os.remove(audio)
-
-#         return create_response(
-#             status="success",
-#             code=200,
-#             message="Face detection successful",
-#             # data={"results": result, "audio": audio_base64, "response": greeting}
-#             data={"results": result,  "response": greeting}
-#         )
-#     except ValueError as ve:
-#         logging.error(f"ValueError: {ve}")
-#         return create_response(
-#             status="error",
-#             code=400,
-#             message=str(ve),
-#             data={}
-#         )
-#     except Exception as e:
-#         logging.error(f"Unexpected error during face detection: {e}")
-#         return create_response(
-#             status="error",
-#             code=500,
-#             message="Error in face detection",
-#             data={}
-#         )
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8080)
 
 
-# const voiceId = "8EkOjt4xTPGMclNlh1pk"; // Replace with the desired voice ID
-#   const voiceSettings = {
-#     stability: 0.8,
-#     similarity_boost: 0.6,
-#     style: 0.4,
-#   };

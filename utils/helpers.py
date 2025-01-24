@@ -6,6 +6,7 @@ import onnxruntime
 import pickle
 from models.schemas import MetaResponse, ApiResponse
 import base64
+from fastapi.responses import JSONResponse
 
 
 def audio_to_base64(file_path):
@@ -16,7 +17,10 @@ def audio_to_base64(file_path):
 
 def create_response(status: str, code: int, message: str, data: dict = None) -> ApiResponse:
     meta = MetaResponse(status=status, code=code, message=message)
-    return ApiResponse(meta=meta, data=data)
+    return JSONResponse(
+        content=ApiResponse(meta=meta, data=data).dict(),
+        status_code=code
+    )
 
 # Load FaceNet ONNX model
 facenet_session = onnxruntime.InferenceSession('model_weights/facenet_model.onnx')
